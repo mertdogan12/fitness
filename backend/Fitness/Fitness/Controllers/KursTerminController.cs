@@ -55,7 +55,7 @@ namespace Fitness.Controllers
             var termine = await _context.KurseTermine
                 .Include(t => t.Kurs)
                 .Where(t => t.Anfang.HasValue
-                            && t.Anfang.Value >= ab.Value
+                            && t.Anfang.Value >= von.Value
                             && (bis == null || t.Anfang.Value <= bis.Value))
                 .ToListAsync();
 
