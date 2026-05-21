@@ -28,7 +28,7 @@ export async function getKursTermineFuerWoche(wochenstart) {
       geschlecht: termin.kurs.geschlecht,
       trainer: `Trainer ${termin.trainerID}`,
       teilnehmerAnzahl: termin.teilnehmerAnzahl ?? 0,
-      maxTeilnehmer: termin.maxTeilnehmer ?? null,
+      maxTeilnehmer: termin.maxTeilnehmer,
       istVoll: termin.maxTeilnehmer
         ? (termin.teilnehmerAnzahl ?? 0) >= termin.maxTeilnehmer
         : false
@@ -37,16 +37,29 @@ export async function getKursTermineFuerWoche(wochenstart) {
 }
 
 export async function anmeldenZuKurs(daten) {
-  const response = await fetch(`${API_BASE_URL}/anmeldung`, {
+  // Zufällige ID generieren (bis Backend auto-increment übernimmt)
+  const tempId = Math.floor(Math.random() * 90000) + 10000
+
+  const buchungResponse = await fetch(`${API_BASE_URL}/Buchungen/buchen`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(daten)
+    body: JSON.stringify({
+      userId: tempId,
+      user: {
+        id: tempId,
+        vorname: daten.vorname,
+        name: daten.name,
+        alter: daten.alter,
+        geschlecht: daten.geschlecht
+      },
+      kursTerminId: daten.kursTerminId
+    })
   })
 
-  if (!response.ok) {
-    const err = await response.json().catch(() => ({}))
-    throw new Error(err.message || 'Anmeldung fehlgeschlagen.')
+  if (!buchungResponse.ok) {
+    const err = await buchungResponse.json().catch(() => ({}))
+    throw new Error(err.message || 'Buchung fehlgeschlagen.')
   }
 
-  return response.json()
+  return buchungResponse.json()
 }
