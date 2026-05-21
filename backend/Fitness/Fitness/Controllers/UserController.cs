@@ -20,6 +20,7 @@ namespace Fitness.Controllers
         public async Task<IActionResult> CreateUser([FromBody] User user)
         {
             _context.Users.Add(user);
+
             try
             {
                 await _context.SaveChangesAsync();
@@ -28,6 +29,7 @@ namespace Fitness.Controllers
                 Console.WriteLine(ex);
                 return BadRequest($"Fehler beim Erstellen des Benutzers. {ex.Message}");
             }
+
             return CreatedAtAction(nameof(CreateUser), new { id = user.Id }, user);
         }
 

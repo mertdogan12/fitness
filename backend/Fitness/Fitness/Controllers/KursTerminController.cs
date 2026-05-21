@@ -21,6 +21,7 @@ namespace Fitness.Controllers
         public async Task<IActionResult> CreateTermin([FromBody] KursTermin termin)
         {
             _context.KurseTermine.Add(termin);
+
             try
             {
                 await _context.SaveChangesAsync();
@@ -36,7 +37,7 @@ namespace Fitness.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetKursTermin(int id)
         {
-            KursTermin? termin = await _context.getSingleTermin(id);
+            KursTerminDto? termin = await _context.getSingleTermin(id);
 
             if (termin == null)
             {
