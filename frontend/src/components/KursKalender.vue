@@ -122,17 +122,6 @@ const laden = ref(false)
 
 const ausgewaehlterTermin = ref(null)
 
-async function ladeTermine() {
-  laden.value = true
-  try {
-    termine.value = await getKursTermineFuerWoche(wochenstart.value)
-  } catch (e) {
-    console.error('Fehler beim Laden:', e)
-  } finally {
-    laden.value = false
-  }
-}
-
 function termineProTag(datum) {
   return termine.value
     .filter(t => {
