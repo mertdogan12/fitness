@@ -49,7 +49,7 @@ namespace Fitness.Controllers
         [HttpGet]
         public async Task<IActionResult> GetKurseAb([FromQuery] DateTime? von, [FromQuery] DateTime? bis = null)
         {
-            if (ab == null)
+            if (von == null)
                 return BadRequest("Query-Parameter 'ab' ist erforderlich (z. B. 2026-05-21 oder 2026-05-21T14:00:00).");
 
             var termine = await _context.KurseTermine
