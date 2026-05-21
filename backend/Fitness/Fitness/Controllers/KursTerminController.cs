@@ -33,16 +33,6 @@ namespace Fitness.Controllers
             return CreatedAtAction(nameof(CreateTermin), new { id = termin.Id }, await _context.getSingleTermin(termin.Id));
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetKursTermine()
-        {
-            List<KursTermin> termine = await _context.Set<KursTermin>()
-                .Include(k => k.Kurs)
-                .ToListAsync();
-
-            return Ok(termine);
-        }
-
         [HttpGet("{id}")]
         public async Task<IActionResult> GetKursTermin(int id)
         {
@@ -54,6 +44,22 @@ namespace Fitness.Controllers
             }
 
             return Ok(termin);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetKurseAb([FromQuery] DateTime? von, [FromQuery] DateTime? bis = null)
+        {
+            if (ab == null)
+                return BadRequest("Query-Parameter 'ab' ist erforderlich (z. B. 2026-05-21 oder 2026-05-21T14:00:00).");
+
+            var termine = await _context.KurseTermine
+                .Include(t => t.Kurs)
+                .Where(t => t.Anfang.HasValue
+                            && t.Anfang.Value >= ab.Value
+                            && (bis == null || t.Anfang.Value <= bis.Value))
+                .ToListAsync();
+
+            return Ok(termine);
         }
     }
 }
