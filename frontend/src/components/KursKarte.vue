@@ -34,9 +34,12 @@
       </div>
 
       <div class="auslastung-text">
-        <span>👥 {{ termin.teilnehmerAnzahl }} / {{ termin.maxTeilnehmer }}</span>
+        <span>👥 {{ termin.teilnehmerAnzahl }}</span>
+        <span v-if="termin.maxTeilnehmer !== null"> / {{ termin.maxTeilnehmer }}</span>
         <span v-if="termin.istVoll" class="voll-label">Ausgebucht</span>
-        <span v-else class="frei-label">{{ termin.maxTeilnehmer - termin.teilnehmerAnzahl }} Plätze frei</span>
+        <span v-else-if="termin.maxTeilnehmer !== null" class="frei-label">
+         {{ termin.maxTeilnehmer - termin.teilnehmerAnzahl }} Plätze frei
+      </span>
       </div>
     </div>
   </div>
