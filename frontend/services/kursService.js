@@ -1,31 +1,41 @@
 const API_BASE_URL = import.meta.env.VITE_API_URL
 
-/**
- * Gibt alle Kurstermine einer Woche zurück
- * GET /api/kurstermine?von=2026-05-18
- */
 export async function getKursTermineFuerWoche(wochenstart) {
-  const von = wochenstart.toISOString().split('T')[0] // nur Datum z.B. "2026-05-18"
+  const von = wochenstart.toISOString().split('T')[0]
 
-  const response = await fetch(`${API_BASE_URL}/kurstermine?von=${von}`)
+  const wochenende = new Date(wochenstart)
+  wochenende.setDate(wochenende.getDate() + 6)
+  const bis = wochenende.toISOString().split('T')[0]
+
+  const response = await fetch(`${API_BASE_URL}/KursTermin?von=${von}&bis=${bis}`)
 
   if (!response.ok) throw new Error('Fehler beim Laden der Kurstermine')
 
   const daten = await response.json()
+  return daten.map(termin => {
+    const anfang = new Date(termin.anfang)
+    const ende = new Date(anfang.getTime() + (termin.kurs.dauer || 60) * 60000)
 
-  // Datum-Strings in echte Date-Objekte umwandeln
-  return daten.map(termin => ({
-    ...termin,
-    anfang: new Date(termin.anfang),
-    ende: new Date(termin.ende)
-  }))
+    return {
+      terminId: termin.id,
+      anfang,
+      ende,
+      kursId: termin.kursId,
+      titel: termin.kurs.titel,
+      beschreibung: termin.kurs.beschreibung,
+      dauer: termin.kurs.dauer,
+      minAlter: termin.kurs.minAlter,
+      geschlecht: termin.kurs.geschlecht,
+      trainer: `Trainer ${termin.trainerID}`,
+      teilnehmerAnzahl: termin.teilnehmerAnzahl ?? 0,
+      maxTeilnehmer: termin.maxTeilnehmer ?? null,
+      istVoll: termin.maxTeilnehmer
+        ? (termin.teilnehmerAnzahl ?? 0) >= termin.maxTeilnehmer
+        : false
+    }
+  })
 }
 
-/**
- * Meldet einen User zu einem Kurstermin an
- * POST /api/anmeldung
- * Body: { vorname, name, alter, geschlecht, kursTerminId }
- */
 export async function anmeldenZuKurs(daten) {
   const response = await fetch(`${API_BASE_URL}/anmeldung`, {
     method: 'POST',
