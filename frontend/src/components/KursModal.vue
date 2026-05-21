@@ -212,13 +212,14 @@ function formularValidieren() {
     validierung.geschlecht = 'Bitte Geschlecht auswählen.'
     gueltig = false
   }
-  if (
-    props.termin.geschlecht &&
-    formular.geschlecht !== props.termin.geschlecht
-  ) {
-    validierung.geschlecht = `Dieser Kurs ist nur für ${props.termin.geschlecht === 'w' ? 'Frauen' : 'Männer'}.`
+  
+    if (
+    props.termin.geschlecht === 'w' &&
+    formular.geschlecht !== 'w'
+    ) {
+    validierung.geschlecht = 'Dieser Kurs ist nur für Frauen.'
     gueltig = false
-  }
+    }
 
   return gueltig
 }
