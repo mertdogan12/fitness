@@ -9,7 +9,9 @@
     />
 
     <div v-if="laden" class="laden">Kurse werden geladen...</div>
-
+    <div v-if="apiFehler" class="api-fehler">
+      ⚠️ {{ apiFehler }}
+    </div>
     <div v-else class="kalender-grid">
       <div
         v-for="tag in wochentage"
@@ -164,6 +166,22 @@ function modalSchliessen() {
   ausgewaehlterTermin.value = null
 }
 
+// Script: apiFehler ref hinzufügen
+const apiFehler = ref('')
+
+async function ladeTermine() {
+  laden.value = true
+  apiFehler.value = ''
+  try {
+    termine.value = await getKursTermineFuerWoche(wochenstart.value)
+  } catch (e) {
+    console.error('Fehler beim Laden:', e)
+    apiFehler.value = 'Kurse konnten nicht geladen werden. Bitte später erneut versuchen.'
+  } finally {
+    laden.value = false
+  }
+}
+
 watch(wochenstart, ladeTermine)
 onMounted(ladeTermine)
 </script>
@@ -227,6 +245,15 @@ onMounted(ladeTermine)
   color: #555;
   font-size: 0.78rem;
   text-align: center;
+  margin-top: 1rem;
+}
+
+.api-fehler {
+  text-align: center;
+  color: #f4a261;
+  background: #4d2e1e;
+  border-radius: 10px;
+  padding: 1.5rem;
   margin-top: 1rem;
 }
 </style>
