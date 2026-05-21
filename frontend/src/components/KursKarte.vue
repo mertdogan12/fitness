@@ -1,5 +1,10 @@
 <template>
-  <div class="kurs-karte" :style="{ borderLeft: `4px solid ${farbe}` }">
+  <div
+    class="kurs-karte"
+    :style="{ borderLeft: `4px solid ${farbe}` }"
+    :class="{ voll: termin.istVoll }"
+    @click="!termin.istVoll && $emit('kursGeklickt', termin)"
+  >
     <div class="kurs-karte-header">
       <span class="kurs-titel">{{ termin.titel }}</span>
       <span class="kurs-uhrzeit">
@@ -17,18 +22,47 @@
     </div>
 
     <div class="kurs-karte-footer">
-      <span class="teilnehmer">👥 {{ termin.teilnehmerAnzahl }} Teilnehmer</span>
+      <!-- Auslastungsbalken -->
+      <div class="auslastung-balken-hintergrund">
+        <div
+          class="auslastung-balken-fuell"
+          :style="{
+            width: auslastungProzent + '%',
+            background: auslastungFarbe
+          }"
+        ></div>
+      </div>
+
+      <div class="auslastung-text">
+        <span>👥 {{ termin.teilnehmerAnzahl }} / {{ termin.maxTeilnehmer }}</span>
+        <span v-if="termin.istVoll" class="voll-label">Ausgebucht</span>
+        <span v-else class="frei-label">{{ termin.maxTeilnehmer - termin.teilnehmerAnzahl }} Plätze frei</span>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-defineProps({
+import { computed } from 'vue'
+
+const props = defineProps({
   termin: Object,
   farbe: {
     type: String,
     default: '#e63946'
   }
+})
+
+defineEmits(['kursGeklickt'])
+
+const auslastungProzent = computed(() =>
+  Math.min((props.termin.teilnehmerAnzahl / props.termin.maxTeilnehmer) * 100, 100)
+)
+
+const auslastungFarbe = computed(() => {
+  if (auslastungProzent.value >= 100) return '#e63946'  // rot = voll
+  if (auslastungProzent.value >= 75) return '#f9c784'   // orange = fast voll
+  return '#a8d8a8'                                       // grün = Plätze frei
 })
 
 function formatZeit(datum) {
@@ -40,47 +74,45 @@ function formatZeit(datum) {
 </script>
 
 <style scoped>
-.kurs-karte {
-  background: #16213e;
-  border-radius: 10px;
-  padding: 0.75rem 1rem;
-  margin-bottom: 0.6rem;
-  transition: transform 0.15s, box-shadow 0.15s;
-  cursor: default;
+/* bestehende styles bleiben, folgendes NEU hinzufügen: */
+
+.kurs-karte.voll {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 
-.kurs-karte:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+.kurs-karte.voll:hover {
+  transform: none;
+  box-shadow: none;
 }
 
-.kurs-karte-header {
+.auslastung-balken-hintergrund {
+  height: 5px;
+  background: #2a2a5a;
+  border-radius: 99px;
+  margin-bottom: 0.4rem;
+  overflow: hidden;
+}
+
+.auslastung-balken-fuell {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 0.4s ease;
+}
+
+.auslastung-text {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.4rem;
-}
-
-.kurs-titel {
-  font-weight: 700;
-  font-size: 0.95rem;
-  color: #f0f0f0;
-}
-
-.kurs-uhrzeit {
-  font-size: 0.78rem;
-  color: #aaa;
-}
-
-.kurs-karte-body p {
-  margin: 0.15rem 0;
-  font-size: 0.82rem;
-  color: #ccc;
-}
-
-.kurs-karte-footer {
-  margin-top: 0.5rem;
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   color: #888;
+}
+
+.voll-label {
+  color: #e63946;
+  font-weight: 700;
+}
+
+.frei-label {
+  color: #a8d8a8;
 }
 </style>

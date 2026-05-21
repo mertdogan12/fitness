@@ -9,7 +9,9 @@
     />
 
     <div v-if="laden" class="laden">Kurse werden geladen...</div>
-
+    <div v-if="apiFehler" class="api-fehler">
+      ⚠️ {{ apiFehler }}
+    </div>
     <div v-else class="kalender-grid">
       <div
         v-for="tag in wochentage"
@@ -30,10 +32,17 @@
             :key="termin.terminId"
             :termin="termin"
             :farbe="kursfarbe(termin.kursId)"
+            @kursGeklickt="modalOeffnen"
           />
           <p v-if="termineProTag(tag.datum).length === 0" class="keine-kurse">
             Keine Kurse
           </p>
+          <KursModal
+            v-if="ausgewaehlterTermin"
+            :termin="ausgewaehlterTermin"
+            :farbe="kursfarbe(ausgewaehlterTermin.kursId)"
+            @schliessen="modalSchliessen"
+            />
         </div>
       </div>
     </div>
@@ -45,6 +54,7 @@ import { ref, computed, watch, onMounted } from 'vue'
 import WochenNavigator from './WochenNavigator.vue'
 import KursKarte from './KursKarte.vue'
 import { getKursTermineFuerWoche } from '../../services/kursService.js'
+import KursModal from './KursModal.vue'
 
 // Farbpalette je Kurs-ID
 const KURS_FARBEN = {
@@ -110,16 +120,7 @@ const wochentage = computed(() => {
 const termine = ref([])
 const laden = ref(false)
 
-async function ladeTermine() {
-  laden.value = true
-  try {
-    termine.value = await getKursTermineFuerWoche(wochenstart.value)
-  } catch (e) {
-    console.error('Fehler beim Laden:', e)
-  } finally {
-    laden.value = false
-  }
-}
+const ausgewaehlterTermin = ref(null)
 
 function termineProTag(datum) {
   return termine.value
@@ -144,6 +145,30 @@ function istHeute(datum) {
 
 function formatTagDatum(datum) {
   return datum.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })
+}
+
+function modalOeffnen(termin) {
+  ausgewaehlterTermin.value = termin
+}
+
+function modalSchliessen() {
+  ausgewaehlterTermin.value = null
+}
+
+// Script: apiFehler ref hinzufügen
+const apiFehler = ref('')
+
+async function ladeTermine() {
+  laden.value = true
+  apiFehler.value = ''
+  try {
+    termine.value = await getKursTermineFuerWoche(wochenstart.value)
+  } catch (e) {
+    console.error('Fehler beim Laden:', e)
+    apiFehler.value = 'Kurse konnten nicht geladen werden. Bitte später erneut versuchen.'
+  } finally {
+    laden.value = false
+  }
 }
 
 watch(wochenstart, ladeTermine)
@@ -209,6 +234,15 @@ onMounted(ladeTermine)
   color: #555;
   font-size: 0.78rem;
   text-align: center;
+  margin-top: 1rem;
+}
+
+.api-fehler {
+  text-align: center;
+  color: #f4a261;
+  background: #4d2e1e;
+  border-radius: 10px;
+  padding: 1.5rem;
   margin-top: 1rem;
 }
 </style>
