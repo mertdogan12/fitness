@@ -1,6 +1,7 @@
 ﻿using Fitness.Data;
 using Fitness.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Fitness.Controllers
 {
@@ -19,7 +20,15 @@ namespace Fitness.Controllers
         public IActionResult CreateKurs([FromBody]Kurs kurs)
         {
             _context.Kurse.Add(kurs);
-            _context.SaveChanges();
+            try
+            {
+                _context.SaveChanges();
+            } catch (DbUpdateException ex)
+            {
+                Console.WriteLine(ex);
+                return BadRequest($"Fehler beim Erstellen des Kurses. {ex.Message}");
+            }
+
             return CreatedAtAction(nameof(CreateKurs), new { id = kurs.Id }, kurs);
         }
 

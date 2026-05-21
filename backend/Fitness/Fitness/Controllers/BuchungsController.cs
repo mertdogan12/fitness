@@ -31,7 +31,7 @@ namespace Fitness.Controllers
                 return BadRequest($"Fehler beim Erstellen der Buchung. {ex.Message}");
             }
 
-            return Ok(buchung);
+            return Ok();
         }
 
         [HttpPost("stonieren")]
