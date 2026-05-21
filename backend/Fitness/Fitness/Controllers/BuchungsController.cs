@@ -35,9 +35,18 @@ namespace Fitness.Controllers
         }
 
         [HttpPost("stonieren")]
-        public async Task<IActionResult> StroniereBuchung([FromBody] NimmtTeil buchung)
+        public async Task<IActionResult> StroniereBuchung([FromBody] StonierungsDto buchung)
         {
-            return Ok();
+            List<NimmtTeil> termin = await _context.NimmtTeil
+                .Where(u => u != null && u.User.Name == buchung.Name && u.User.Vorname == buchung.Vorname && u.KursTerminId == buchung.terminID)
+                .ToListAsync();
+
+            foreach (var item in termin)
+            {
+                _context.NimmtTeil.Remove(item);
+            }
+
+            return NoContent();
         }
     }
 }
