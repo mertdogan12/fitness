@@ -30,10 +30,17 @@
             :key="termin.terminId"
             :termin="termin"
             :farbe="kursfarbe(termin.kursId)"
+            @kursGeklickt="modalOeffnen"
           />
           <p v-if="termineProTag(tag.datum).length === 0" class="keine-kurse">
             Keine Kurse
           </p>
+          <KursModal
+            v-if="ausgewaehlterTermin"
+            :termin="ausgewaehlterTermin"
+            :farbe="kursfarbe(ausgewaehlterTermin.kursId)"
+            @schliessen="modalSchliessen"
+            />
         </div>
       </div>
     </div>
@@ -45,6 +52,7 @@ import { ref, computed, watch, onMounted } from 'vue'
 import WochenNavigator from './WochenNavigator.vue'
 import KursKarte from './KursKarte.vue'
 import { getKursTermineFuerWoche } from '../../services/kursService.js'
+import KursModal from './KursModal.vue'
 
 // Farbpalette je Kurs-ID
 const KURS_FARBEN = {
@@ -110,6 +118,8 @@ const wochentage = computed(() => {
 const termine = ref([])
 const laden = ref(false)
 
+const ausgewaehlterTermin = ref(null)
+
 async function ladeTermine() {
   laden.value = true
   try {
@@ -144,6 +154,14 @@ function istHeute(datum) {
 
 function formatTagDatum(datum) {
   return datum.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })
+}
+
+function modalOeffnen(termin) {
+  ausgewaehlterTermin.value = termin
+}
+
+function modalSchliessen() {
+  ausgewaehlterTermin.value = null
 }
 
 watch(wochenstart, ladeTermine)

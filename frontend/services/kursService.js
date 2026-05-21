@@ -25,6 +25,26 @@ export async function getKursTermineFuerWoche(wochenstart) {
   return response.json()
 }
 
+export async function anmeldenZuKurs(daten) {
+  if (USE_MOCK) {
+    await new Promise(r => setTimeout(r, 500))
+    // Mock: einfach Erfolg simulieren
+    console.log('Mock-Anmeldung:', daten)
+    return { success: true }
+  }
+   const response = await fetch(`${API_BASE_URL}/anmeldung`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(daten)
+    // daten = { vorname, name, alter, geschlecht, kursTerminId }
+  })
+  if (!response.ok) {
+    const err = await response.json()
+    throw new Error(err.message || 'Anmeldung fehlgeschlagen.')
+  }
+  return response.json()
+}
+
 /**
  * Simuliert den DB-JOIN aus:
  * Kurs-Termin → Kurs, Trainer, Nimmt-Teil
@@ -61,7 +81,9 @@ function buildKalenderDaten(wochenstart) {
         minAlter: kurs.minAlter,
         geschlecht: kurs.geschlecht,
         trainer: `${trainer.vorname} ${trainer.name}`,
-        teilnehmerAnzahl
+        teilnehmerAnzahl, 
+        maxTeilnehmer: termin.maxTeilnehmer,
+        istVoll: teilnehmerAnzahl >= termin.maxTeilnehmer
       }
     })
 }

@@ -45,12 +45,12 @@ export const mockKurse = [
 // Entspricht Tabelle: Kurs-Termin
 // "anfang" = Datum + Uhrzeit, Endzeit wird aus Kurs.dauer berechnet
 export const mockKursTermine = [
-  { id: 1, kursId: 2, anfang: "2026-05-18T07:00:00", trainerId: 2 }, // Mo Cycling
-  { id: 2, kursId: 1, anfang: "2026-05-19T08:00:00", trainerId: 1 }, // Di Yoga
-  { id: 3, kursId: 3, anfang: "2026-05-20T18:00:00", trainerId: 3 }, // Mi Functional
-  { id: 4, kursId: 4, anfang: "2026-05-21T10:00:00", trainerId: 4 }, // Do Rücken
-  { id: 5, kursId: 1, anfang: "2026-05-22T17:00:00", trainerId: 1 }, // Fr Yoga
-  { id: 6, kursId: 2, anfang: "2026-05-23T09:00:00", trainerId: 2 }, // Sa Cycling
+  { id: 1, kursId: 2, anfang: "2026-05-18T07:00:00", trainerId: 2, maxTeilnehmer: 20 },
+  { id: 2, kursId: 1, anfang: "2026-05-19T08:00:00", trainerId: 1, maxTeilnehmer: 15 },
+  { id: 3, kursId: 3, anfang: "2026-05-20T18:00:00", trainerId: 3, maxTeilnehmer: 12 },
+  { id: 4, kursId: 4, anfang: "2026-05-21T10:00:00", trainerId: 4, maxTeilnehmer: 10 },
+  { id: 5, kursId: 1, anfang: "2026-05-22T17:00:00", trainerId: 1, maxTeilnehmer: 15 },
+  { id: 6, kursId: 2, anfang: "2026-05-23T09:00:00", trainerId: 2, maxTeilnehmer: 20 },
 ]
 
 // Entspricht Tabelle: Nimmt-Teil
