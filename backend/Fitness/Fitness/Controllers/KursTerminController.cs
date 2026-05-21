@@ -50,16 +50,34 @@ namespace Fitness.Controllers
         public async Task<IActionResult> GetKurseAb([FromQuery] DateTime? von, [FromQuery] DateTime? bis = null)
         {
             if (von == null)
-                return BadRequest("Query-Parameter 'ab' ist erforderlich (z. B. 2026-05-21 oder 2026-05-21T14:00:00).");
+                return BadRequest("Query-Parameter 'von' ist erforderlich (z. B. 2026-05-21 oder 2026-05-21T14:00:00).");
 
-            var termine = await _context.KurseTermine
+
+            List<KursTermin> termine = await _context.KurseTermine
                 .Include(t => t.Kurs)
                 .Where(t => t.Anfang.HasValue
                             && t.Anfang.Value >= von.Value
                             && (bis == null || t.Anfang.Value <= bis.Value))
                 .ToListAsync();
 
-            return Ok(termine);
+            Dictionary<int, int> counts = await _context.NimmtTeil
+                .Where(n => termine.Select(ft => ft.Id).Contains(n.KursTerminId))
+                .GroupBy(n => n.KursTerminId)
+                .Select(g => new { Id = g.Key, Count = g.Count() })
+                .ToDictionaryAsync(x => x.Id, x => x.Count);
+
+            List<KursTerminDto> dtos = termine.Select(t => new KursTerminDto
+            {
+                Id = t.Id,
+                KursId = t.KursId,
+                Kurs = t.Kurs,
+                TrainerID = t.TrainerID,
+                Anfang = t.Anfang,
+                MaxTeilnehmer = t.MaxTeilnehmer,
+                TeilnehmerAnzahl = counts.TryGetValue(t.Id, out var c) ? c : 0
+            }).ToList();
+
+            return Ok(dtos);
         }
     }
 }

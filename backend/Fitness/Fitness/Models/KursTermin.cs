@@ -24,5 +24,9 @@ namespace Fitness.Models
 
         [Column("ANFANG", TypeName = "DATE")]
         public DateTime? Anfang { get; set; }
+
+        [Column("MAX_TEILNEHMER")]
+        [Required]
+        public int MaxTeilnehmer { get; set; }
     }
 }
