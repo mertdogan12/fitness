@@ -16,7 +16,7 @@ namespace Fitness.Models
         public int KursId { get; set; }
 
         [ForeignKey(nameof(KursId))]
-        public Kurs Kurs { get; set; }
+        public Kurs? Kurs { get; set; }
 
         [Column("TRAINER_ID")]
         [Required]

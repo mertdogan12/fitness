@@ -1,6 +1,8 @@
 ﻿using Fitness.Data;
 using Fitness.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace Fitness.Controllers
 {
@@ -16,30 +18,42 @@ namespace Fitness.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateTermin([FromBody] KursTermin termin)
+        public async Task<IActionResult> CreateTermin([FromBody] KursTermin termin)
         {
             _context.KurseTermine.Add(termin);
-            _context.SaveChanges();
-            return CreatedAtAction(nameof(CreateTermin), new { id = termin.Id }, termin);
+            try
+            {
+                await _context.SaveChangesAsync();
+            } catch (DbUpdateException ex)
+            {
+                Console.WriteLine(ex);
+                return BadRequest($"Fehler beim Erstellen des Termins. {ex.Message}");
+            }
+
+            return CreatedAtAction(nameof(CreateTermin), new { id = termin.Id }, await _context.getSingleTermin(termin.Id));
         }
 
         [HttpGet]
-        public IActionResult GetKursTermine()
+        public async Task<IActionResult> GetKursTermine()
         {
-            return Ok(_context.KurseTermine.ToList());
+            List<KursTermin> termine = await _context.Set<KursTermin>()
+                .Include(k => k.Kurs)
+                .ToListAsync();
+
+            return Ok(termine);
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetKursTermin(int id)
+        public async Task<IActionResult> GetKursTermin(int id)
         {
-            var kurs = _context.KurseTermine.Find(id);
+            KursTermin? termin = await _context.getSingleTermin(id);
 
-            if (kurs == null)
+            if (termin == null)
             {
-                return NotFound();
+                return NotFound($"Termin mit der ID {id} existiert nicht");
             }
 
-            return Ok(kurs);
+            return Ok(termin);
         }
     }
 }
