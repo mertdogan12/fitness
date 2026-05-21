@@ -23,7 +23,7 @@ namespace Fitness.Models
 
         [Column("USERALTER")]
         [Required]
-        public int MinAlter { get; set; }
+        public int Alter { get; set; }
 
         [Column("GESCHLECHT")]
         [StringLength(20)]

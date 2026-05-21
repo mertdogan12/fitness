@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Fitness.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/buchungen")]
     [ApiController]
     public class BuchungsController : Controller
     {
@@ -16,7 +16,7 @@ namespace Fitness.Controllers
             this._context = context;
         }
 
-        [HttpPost]
+        [HttpPost("buchen")]
         public async Task<IActionResult> CreateBuchung([FromBody] NimmtTeil buchung)
         {
             _context.NimmtTeil.Add(buchung);
@@ -32,6 +32,12 @@ namespace Fitness.Controllers
             }
 
             return Ok(buchung);
+        }
+
+        [HttpPost("stonieren")]
+        public async Task<IActionResult> StroniereBuchung([FromBody] NimmtTeil buchung)
+        {
+            return Ok();
         }
     }
 }
