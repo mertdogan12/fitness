@@ -41,9 +41,23 @@ namespace Fitness.Controllers
                 .Where(u => u != null && u.User.Name == buchung.Name && u.User.Vorname == buchung.Vorname && u.KursTerminId == buchung.terminID)
                 .ToListAsync();
 
+            if (termin.Count() == 0)
+            {
+                return NotFound();
+            }
+
             foreach (var item in termin)
             {
+                Console.WriteLine(item.KursTerminId);
                 _context.NimmtTeil.Remove(item);
+
+                try
+                {
+                    await _context.SaveChangesAsync();
+                } catch(DbUpdateException ex)
+                {
+                    return BadRequest($"Error beim stonieren: {ex.Message}");
+                }
             }
 
             return NoContent();
