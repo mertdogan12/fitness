@@ -16,9 +16,7 @@
       <p class="kurs-trainer">👤 {{ termin.trainer }}</p>
       <p class="kurs-info">⏱ {{ termin.dauer }} Min.</p>
       <p v-if="termin.minAlter" class="kurs-info">🔞 ab {{ termin.minAlter }} Jahren</p>
-      <p v-if="termin.geschlecht" class="kurs-info">
-        {{ termin.geschlecht === 'w' ? '♀ Nur Frauen' : '♂ Nur Männer' }}
-      </p>
+      <p v-if="termin.geschlecht === 'w'" class="kurs-info">♀ Nur Frauen</p>
     </div>
 
     <div class="kurs-karte-footer">

@@ -41,10 +41,12 @@ export async function anmeldenZuKurs(daten) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      vorname: daten.vorname,
-      name: daten.name,
-      alter: daten.alter,
-      geschlecht: daten.geschlecht,
+      user: {
+        vorname: daten.vorname,
+        name: daten.name,
+        alter: daten.alter,
+        geschlecht: daten.geschlecht
+      },
       kursTerminId: daten.kursTerminId
     })
   })
@@ -54,5 +56,6 @@ export async function anmeldenZuKurs(daten) {
     throw new Error(err.message || 'Buchung fehlgeschlagen.')
   }
 
-  return buchungResponse.json()
+  const text = await buchungResponse.text()
+  return text ? JSON.parse(text) : { success: true }
 }
