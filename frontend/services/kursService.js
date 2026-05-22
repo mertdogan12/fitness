@@ -37,21 +37,14 @@ export async function getKursTermineFuerWoche(wochenstart) {
 }
 
 export async function anmeldenZuKurs(daten) {
-  // Zufällige ID generieren (bis Backend auto-increment übernimmt)
-  const tempId = Math.floor(Math.random() * 90000) + 10000
-
   const buchungResponse = await fetch(`${API_BASE_URL}/Buchungen/buchen`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      userId: tempId,
-      user: {
-        id: tempId,
-        vorname: daten.vorname,
-        name: daten.name,
-        alter: daten.alter,
-        geschlecht: daten.geschlecht
-      },
+      vorname: daten.vorname,
+      name: daten.name,
+      alter: daten.alter,
+      geschlecht: daten.geschlecht,
       kursTerminId: daten.kursTerminId
     })
   })
