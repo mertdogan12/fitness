@@ -184,57 +184,6 @@ onMounted(ladeTermine)
   text-align: center;
   color: #aaa;
   padding: 3rem;
-  font-size: 1rem;
-}
-
-.kalender-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 0.75rem;
-}
-
-.tag-spalte {
-  background: #0f3460;
-  border-radius: 12px;
-  padding: 0.75rem;
-  min-height: 300px;
-}
-
-.tag-spalte.heute {
-  background: #1a1a4e;
-  box-shadow: 0 0 0 2px #e63946;
-}
-
-.tag-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 0.75rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
-}
-
-.tag-name {
-  font-weight: 700;
-  font-size: 1rem;
-  color: #e63946;
-}
-
-.tag-datum {
-  font-size: 0.75rem;
-  color: #aaa;
-}
-
-.tag-kurse {
-  display: flex;
-  flex-direction: column;
-}
-
-.keine-kurse {
-  color: #555;
-  font-size: 0.78rem;
-  text-align: center;
-  margin-top: 1rem;
 }
 
 .api-fehler {
@@ -243,6 +192,63 @@ onMounted(ladeTermine)
   background: #4d2e1e;
   border-radius: 10px;
   padding: 1.5rem;
+  margin-top: 1rem;
+}
+
+.kalender-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.6rem;
+}
+
+.tag-spalte {
+  background: rgba(10, 15, 30, 0.75);
+  backdrop-filter: blur(8px);
+  border-radius: 10px;
+  padding: 0.6rem;
+  min-height: 300px;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.tag-spalte.heute {
+  border: 1px solid #e63946;
+  background: rgba(20, 10, 20, 0.8);
+}
+
+.wochen-navigator {
+  background: rgba(10, 15, 30, 0.75);
+  backdrop-filter: blur(8px);
+  border-radius: 12px;
+}
+
+.tag-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 0.5rem;
+  margin-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+
+.tag-name {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #fff;
+}
+
+.tag-spalte.heute .tag-name {
+  color: #e63946;
+}
+
+.tag-datum {
+  font-size: 0.72rem;
+  color: #666;
+}
+
+.keine-kurse {
+  color: #444;
+  font-size: 0.75rem;
+  text-align: center;
   margin-top: 1rem;
 }
 </style>

@@ -1,52 +1,43 @@
 <template>
   <div
     class="kurs-karte"
-    :style="{ borderLeft: `4px solid ${farbe}` }"
     :class="{ voll: termin.istVoll }"
     @click="!termin.istVoll && $emit('kursGeklickt', termin)"
   >
-    <div class="kurs-karte-header">
+    <div class="kurs-karte-top" :style="{ background: farbe }">
       <span class="kurs-titel">{{ termin.titel }}</span>
-      <span class="kurs-uhrzeit">
-        {{ formatZeit(termin.anfang) }} – {{ formatZeit(termin.ende) }}
-      </span>
+      <span class="kurs-uhrzeit">{{ formatZeit(termin.anfang) }} – {{ formatZeit(termin.ende) }}</span>
     </div>
 
     <div class="kurs-karte-body">
-      <p class="kurs-trainer">👤 {{ termin.trainer }}</p>
-      <p class="kurs-info">⏱ {{ termin.dauer }} Min.</p>
-      <p v-if="termin.minAlter" class="kurs-info">🔞 ab {{ termin.minAlter }} Jahren</p>
-      <p v-if="termin.geschlecht === 'w'" class="kurs-info">♀ Nur Frauen</p>
-    </div>
-
-    <div class="kurs-karte-footer">
-      <!-- Auslastungsbalken -->
-      <div class="auslastung-balken-hintergrund">
-        <div
-          class="auslastung-balken-fuell"
-          :style="{
-            width: auslastungProzent + '%',
-            background: auslastungFarbe
-          }"
-        ></div>
+      <div class="kurs-row">
+        <span class="label">Trainer</span>
+        <span>{{ termin.trainer }}</span>
       </div>
-
-      <div class="auslastung-text">
-        <span>👥 {{ termin.teilnehmerAnzahl }}</span>
-        <span v-if="termin.maxTeilnehmer !== null"> / {{ termin.maxTeilnehmer }}</span>
-        <span v-if="termin.istVoll" class="voll-label">Ausgebucht</span>
-        <span v-else-if="termin.maxTeilnehmer !== null" class="frei-label">
-         {{ termin.maxTeilnehmer - termin.teilnehmerAnzahl }} Plätze frei
-      </span>
+      <div class="kurs-row">
+        <span class="label">Dauer</span>
+        <span>{{ termin.dauer }} Min.</span>
+      </div>
+      <div class="kurs-row" v-if="termin.minAlter">
+        <span class="label">Mindestalter</span>
+        <span>{{ termin.minAlter }} Jahre</span>
+      </div>
+      <div class="kurs-row" v-if="termin.geschlecht === 'w'">
+        <span class="label">Zielgruppe</span>
+        <span>Nur Frauen</span>
+      </div>
+      <div class="kurs-row">
+        <span class="label">Plätze</span>
+        <span :class="{ 'text-voll': termin.istVoll, 'text-frei': !termin.istVoll }">
+          {{ termin.istVoll ? 'Ausgebucht' : `${termin.teilnehmerAnzahl} / ${termin.maxTeilnehmer ?? '?'}` }}
+        </span>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'
-
-const props = defineProps({
+defineProps({
   termin: Object,
   farbe: {
     type: String,
@@ -55,16 +46,6 @@ const props = defineProps({
 })
 
 defineEmits(['kursGeklickt'])
-
-const auslastungProzent = computed(() =>
-  Math.min((props.termin.teilnehmerAnzahl / props.termin.maxTeilnehmer) * 100, 100)
-)
-
-const auslastungFarbe = computed(() => {
-  if (auslastungProzent.value >= 100) return '#e63946'  // rot = voll
-  if (auslastungProzent.value >= 75) return '#f9c784'   // orange = fast voll
-  return '#a8d8a8'                                       // grün = Plätze frei
-})
 
 function formatZeit(datum) {
   return new Date(datum).toLocaleTimeString('de-DE', {
@@ -75,45 +56,68 @@ function formatZeit(datum) {
 </script>
 
 <style scoped>
-/* bestehende styles bleiben, folgendes NEU hinzufügen: */
+.kurs-karte {
+  background: #ffffff08;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.kurs-karte:hover:not(.voll) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
 
 .kurs-karte.voll {
-  opacity: 0.55;
+  opacity: 0.45;
   cursor: not-allowed;
 }
 
-.kurs-karte.voll:hover {
-  transform: none;
-  box-shadow: none;
+.kurs-karte-top {
+  padding: 0.5rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
 }
 
-.auslastung-balken-hintergrund {
-  height: 5px;
-  background: #2a2a5a;
-  border-radius: 99px;
-  margin-bottom: 0.4rem;
-  overflow: hidden;
+.kurs-titel {
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: #fff;
 }
 
-.auslastung-balken-fuell {
-  height: 100%;
-  border-radius: 99px;
-  transition: width 0.4s ease;
+.kurs-uhrzeit {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.8);
 }
 
-.auslastung-text {
+.kurs-karte-body {
+  padding: 0.5rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.kurs-row {
   display: flex;
   justify-content: space-between;
-  font-size: 0.75rem;
+  font-size: 0.78rem;
+  color: #ccc;
+}
+
+.label {
   color: #888;
 }
 
-.voll-label {
+.text-voll {
   color: #e63946;
-  font-weight: 700;
+  font-weight: 600;
 }
 
-.frei-label {
+.text-frei {
   color: #a8d8a8;
 }
 </style>

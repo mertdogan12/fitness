@@ -9,7 +9,7 @@ export async function getKursTermineFuerWoche(wochenstart) {
 
   console.log('von:', von, 'bis:', bis)
 
-  const response = await fetch(`${API_BASE_URL}/KursTermin?von=${von}&bis=${bis}`)
+  const response = await fetch(`${API_BASE_URL}/KursTermin?von=${von}`)
 
   if (!response.ok) throw new Error('Fehler beim Laden der Kurstermine')
 

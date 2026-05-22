@@ -24,19 +24,29 @@ import { RouterView } from 'vue-router'
 }
 
 body {
-  background: #0a0a1a;
+  background-color: #0a0a1a;
+  background-image: 
+    linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.85)),
+    url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1920&q=80');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
   color: #e0e0e0;
   font-family: 'Segoe UI', sans-serif;
   min-height: 100vh;
 }
 
 .app-header {
-  background: #1a1a2e;
+  background: rgba(10, 10, 26, 0.85);
+  backdrop-filter: blur(10px);
   padding: 1.2rem 2rem;
   border-bottom: 2px solid #e63946;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 50;
 }
 
 .app-header h1 {
