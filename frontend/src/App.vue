@@ -2,15 +2,18 @@
   <div class="app">
     <header class="app-header">
       <h1>🏋️ Fitti Exempel – Kurskalender</h1>
+      <button class="trainer-btn" @click="$router.push('/trainer/login')">
+        🔐 Trainer-Bereich
+      </button>
     </header>
     <main>
-      <KursKalender />
+      <RouterView />
     </main>
   </div>
 </template>
 
 <script setup>
-import KursKalender from './components/KursKalender.vue'
+import { RouterView } from 'vue-router'
 </script>
 
 <style>
@@ -31,11 +34,31 @@ body {
   background: #1a1a2e;
   padding: 1.2rem 2rem;
   border-bottom: 2px solid #e63946;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .app-header h1 {
   font-size: 1.4rem;
   color: #fff;
   font-weight: 700;
+}
+
+.trainer-btn {
+  background: transparent;
+  border: 1px solid #e63946;
+  color: #e63946;
+  padding: 0.4rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.trainer-btn:hover {
+  background: #e63946;
+  color: white;
 }
 </style>
