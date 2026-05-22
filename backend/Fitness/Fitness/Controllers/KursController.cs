@@ -17,12 +17,12 @@ namespace Fitness.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateKurs([FromBody]Kurs kurs)
+        public async Task<IActionResult> CreateKurs([FromBody]Kurs kurs)
         {
             _context.Kurse.Add(kurs);
             try
             {
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
             } catch (DbUpdateException ex)
             {
                 Console.WriteLine(ex);
@@ -33,9 +33,9 @@ namespace Fitness.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetKurse()
+        public async Task<IActionResult> GetKurse()
         {
-            return Ok(_context.Kurse.ToList());
+            return Ok(await _context.Kurse.ToListAsync());
         }
     }
 }

@@ -16,9 +16,17 @@ namespace Fitness.Controllers
             this._context = context;
         }
 
-        [HttpPost("buchen")]
+        [HttpPost]
         public async Task<IActionResult> CreateBuchung([FromBody] NimmtTeil buchung)
         {
+            KursTerminDto? termin = await _context.getSingleTermin(buchung.KursTerminId);
+
+            if (termin == null)
+                return NotFound($"Termin mit der ID {buchung.KursTerminId} existiert nicht");
+
+            if (termin.MaxTeilnehmer == termin.TeilnehmerAnzahl)
+                return BadRequest($"Kurs mit der ID {termin.KursId} ist schon voll");
+
             _context.NimmtTeil.Add(buchung);
 
             try
@@ -34,7 +42,7 @@ namespace Fitness.Controllers
             return Ok();
         }
 
-        [HttpPost("stonieren")]
+        [HttpDelete]
         public async Task<IActionResult> StroniereBuchung([FromBody] StonierungsDto buchung)
         {
             List<NimmtTeil> termin = await _context.NimmtTeil
