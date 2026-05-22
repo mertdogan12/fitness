@@ -59,7 +59,7 @@ namespace Fitness.Controllers
                 return BadRequest($"Error beim löschen des Kurses. {ex}");
             }
 
-            return Ok(kurs);
+            return NotFound(kurs);
         }
     }
 }

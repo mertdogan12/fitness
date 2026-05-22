@@ -34,6 +34,30 @@ namespace Fitness.Controllers
             return CreatedAtAction(nameof(CreateTermin), new { id = termin.Id }, await _context.getSingleTermin(termin.Id));
         }
 
+        [HttpDelete]
+        public async Task<IActionResult> DeteleteTermin(int id)
+        {
+            KursTermin? termin = await _context.KurseTermine.FindAsync(id);
+
+            if (termin == null)
+            {
+                return NotFound($"Kurstermin mit der ID {id} konnte nicht gefunden werden");
+            }
+
+            _context.KurseTermine.Remove(termin);
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            } catch (DbUpdateException ex)
+            {
+                Console.WriteLine(ex);
+                return BadRequest($"Error beim löschen des Kurstermines. {ex.Message}");
+            }
+
+            return NotFound(termin);
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetKursTermin(int id)
         {
