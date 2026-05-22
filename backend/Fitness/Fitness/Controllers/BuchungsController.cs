@@ -27,6 +27,14 @@ namespace Fitness.Controllers
             if (termin.MaxTeilnehmer == termin.TeilnehmerAnzahl)
                 return BadRequest($"Kurs mit der ID {termin.KursId} ist schon voll");
 
+            User user = buchung.User ?? await _context.Users.FindAsync(buchung.UserId);
+
+            if (user == null)
+                return NotFound($"User mit der ID {buchung.UserId} existiert nicht");
+
+            if (termin.Kurs.Geschlecht != user.Geschlecht && termin.Kurs.Geschlecht != "alle")
+                return BadRequest($"User muss das Geschlecht {termin.Kurs.Geschlecht} haben");
+
             _context.NimmtTeil.Add(buchung);
 
             try
