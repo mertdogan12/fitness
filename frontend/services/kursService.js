@@ -1,11 +1,13 @@
 const API_BASE_URL = import.meta.env.VITE_API_URL
 
 export async function getKursTermineFuerWoche(wochenstart) {
-  const von = wochenstart.toISOString().split('T')[0]
+  const von = wochenstart.toLocaleDateString('en-CA')
 
   const wochenende = new Date(wochenstart)
-  wochenende.setDate(wochenende.getDate() + 6)
+  wochenende.setDate(wochenende.getDate() + 7)
   const bis = wochenende.toISOString().split('T')[0]
+
+  console.log('von:', von, 'bis:', bis)
 
   const response = await fetch(`${API_BASE_URL}/KursTermin?von=${von}&bis=${bis}`)
 
@@ -25,7 +27,7 @@ export async function getKursTermineFuerWoche(wochenstart) {
       beschreibung: termin.kurs.beschreibung,
       dauer: termin.kurs.dauer,
       minAlter: termin.kurs.minAlter,
-      geschlecht: ['m', 'w', 'd'].includes(termin.kurs.geschlecht)
+      geschlecht: ['m'].includes(termin.kurs.geschlecht)
         ? termin.kurs.geschlecht
         : null,
       trainer: `Trainer ${termin.trainerID}`,
