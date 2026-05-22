@@ -28,19 +28,15 @@
             </div>
             <div class="detail-item">
               <span class="detail-label">👥 Teilnehmer</span>
-              <span>{{ termin.teilnehmerAnzahl }} angemeldet</span>
+              <span>{{ termin.teilnehmerAnzahl }} / {{ termin.maxTeilnehmer }}</span>
             </div>
             <div class="detail-item" v-if="termin.minAlter">
               <span class="detail-label">🔞 Mindestalter</span>
               <span>{{ termin.minAlter }} Jahre</span>
             </div>
-            <div class="detail-item" v-if="termin.geschlecht">
+            <div class="detail-item" v-if="termin.geschlecht === 'w'">
               <span class="detail-label">⚧ Zielgruppe</span>
-              <span>{{ termin.geschlecht === 'w' ? 'Nur Frauen' : 'Nur Männer' }}</span>
-            </div>
-            <div class="detail-item">
-                <span class="detail-label">👥 Teilnehmer</span>
-                <span>{{ termin.teilnehmerAnzahl }} / {{ termin.maxTeilnehmer }}</span>
+              <span>Nur Frauen</span>
             </div>
           </div>
         </div>
@@ -51,22 +47,20 @@
         <!-- Anmeldeformular -->
         <div class="anmeldung">
           <h3>Zum Kurs anmelden</h3>
-        <div v-if="termin.istVoll" class="fehler">
-            Dieser Kurs ist leider ausgebucht.
-        </div>
 
-          <!-- Erfolgsmeldung -->
+          <div v-if="termin.istVoll" class="fehler">
+            ❌ Dieser Kurs ist leider ausgebucht.
+          </div>
+
           <div v-if="anmeldungErfolgreich" class="erfolg">
             ✅ Anmeldung erfolgreich! Wir freuen uns auf dich.
           </div>
 
-          <!-- Fehlermeldung -->
           <div v-if="fehler" class="fehler">
             ⚠️ {{ fehler }}
           </div>
 
           <div v-if="!anmeldungErfolgreich && !termin.istVoll">
-            <!-- Vorname -->
             <div class="form-gruppe">
               <label>Vorname *</label>
               <input
@@ -80,7 +74,6 @@
               </span>
             </div>
 
-            <!-- Name -->
             <div class="form-gruppe">
               <label>Nachname *</label>
               <input
@@ -94,7 +87,6 @@
               </span>
             </div>
 
-            <!-- Alter -->
             <div class="form-gruppe">
               <label>Alter *</label>
               <input
@@ -110,7 +102,6 @@
               </span>
             </div>
 
-            <!-- Geschlecht -->
             <div class="form-gruppe">
               <label>Geschlecht *</label>
               <select
@@ -127,25 +118,68 @@
               </span>
             </div>
 
-            <!-- Absenden -->
-            <button
-              class="anmelden-btn"
-              @click="anmelden"
-              :disabled="laden"
-            >
+            <button class="anmelden-btn" @click="anmelden" :disabled="laden">
               {{ laden ? 'Wird angemeldet...' : 'Jetzt anmelden' }}
             </button>
           </div>
         </div>
-      </div>
 
+        <!-- Trennlinie -->
+        <hr class="divider" />
+
+        <!-- Abmeldeformular -->
+        <div class="abmeldung">
+          <h3>Vom Kurs abmelden</h3>
+
+          <div v-if="abmeldungErfolgreich" class="erfolg">
+            ✅ Abmeldung erfolgreich!
+          </div>
+
+          <div v-if="abmeldeFehler" class="fehler">
+            ⚠️ {{ abmeldeFehler }}
+          </div>
+
+          <div v-if="!abmeldungErfolgreich">
+            <div class="form-gruppe">
+              <label>Vorname *</label>
+              <input
+                v-model="abmeldeFormular.vorname"
+                type="text"
+                placeholder="z.B. Leon"
+                :class="{ invalid: abmeldeValidierung.vorname }"
+              />
+              <span class="fehler-text" v-if="abmeldeValidierung.vorname">
+                {{ abmeldeValidierung.vorname }}
+              </span>
+            </div>
+
+            <div class="form-gruppe">
+              <label>Nachname *</label>
+              <input
+                v-model="abmeldeFormular.name"
+                type="text"
+                placeholder="z.B. Bauer"
+                :class="{ invalid: abmeldeValidierung.name }"
+              />
+              <span class="fehler-text" v-if="abmeldeValidierung.name">
+                {{ abmeldeValidierung.name }}
+              </span>
+            </div>
+
+            <button class="abmelden-btn" @click="abmelden" :disabled="abmeldenLaden">
+              {{ abmeldenLaden ? 'Wird abgemeldet...' : 'Vom Kurs abmelden' }}
+            </button>
+          </div>
+        </div>
+
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref, reactive } from 'vue'
-import { anmeldenZuKurs } from '../../services/kursService.js'
+import { anmeldenZuKurs, abmeldenVonKurs } from '../../services/kursService.js'
 
 const props = defineProps({
   termin: Object,
@@ -157,7 +191,7 @@ const props = defineProps({
 
 defineEmits(['schliessen'])
 
-// Formular-Daten – entspricht User-Tabelle (ohne ID, die vergibt die DB)
+// ── Anmeldung ──────────────────────────────────────
 const formular = reactive({
   vorname: '',
   name: '',
@@ -176,15 +210,7 @@ const laden = ref(false)
 const fehler = ref('')
 const anmeldungErfolgreich = ref(false)
 
-function formatZeit(datum) {
-  return new Date(datum).toLocaleTimeString('de-DE', {
-    hour: '2-digit',
-    minute: '2-digit'
-  })
-}
-
 function formularValidieren() {
-  // Reset
   validierung.vorname = ''
   validierung.name = ''
   validierung.alter = ''
@@ -212,14 +238,10 @@ function formularValidieren() {
     validierung.geschlecht = 'Bitte Geschlecht auswählen.'
     gueltig = false
   }
-  
-    if (
-    props.termin.geschlecht === 'w' &&
-    formular.geschlecht !== 'w'
-    ) {
+  if (props.termin.geschlecht === 'w' && formular.geschlecht !== 'w') {
     validierung.geschlecht = 'Dieser Kurs ist nur für Frauen.'
     gueltig = false
-    }
+  }
 
   return gueltig
 }
@@ -231,12 +253,10 @@ async function anmelden() {
   laden.value = true
   try {
     await anmeldenZuKurs({
-      // User-Daten
       vorname: formular.vorname,
       name: formular.name,
       alter: formular.alter,
       geschlecht: formular.geschlecht,
-      // Nimmt-Teil: kursTerminId
       kursTerminId: props.termin.terminId
     })
     anmeldungErfolgreich.value = true
@@ -245,6 +265,63 @@ async function anmelden() {
   } finally {
     laden.value = false
   }
+}
+
+// ── Abmeldung ──────────────────────────────────────
+const abmeldeFormular = reactive({
+  vorname: '',
+  name: ''
+})
+
+const abmeldeValidierung = reactive({
+  vorname: '',
+  name: ''
+})
+
+const abmeldenLaden = ref(false)
+const abmeldungErfolgreich = ref(false)
+const abmeldeFehler = ref('')
+
+function abmeldeFormularValidieren() {
+  abmeldeValidierung.vorname = ''
+  abmeldeValidierung.name = ''
+  let gueltig = true
+
+  if (!abmeldeFormular.vorname.trim()) {
+    abmeldeValidierung.vorname = 'Vorname ist erforderlich.'
+    gueltig = false
+  }
+  if (!abmeldeFormular.name.trim()) {
+    abmeldeValidierung.name = 'Nachname ist erforderlich.'
+    gueltig = false
+  }
+  return gueltig
+}
+
+async function abmelden() {
+  abmeldeFehler.value = ''
+  if (!abmeldeFormularValidieren()) return
+
+  abmeldenLaden.value = true
+  try {
+    await abmeldenVonKurs({
+      vorname: abmeldeFormular.vorname,
+      name: abmeldeFormular.name,
+      kursTerminId: props.termin.terminId
+    })
+    abmeldungErfolgreich.value = true
+  } catch (e) {
+    abmeldeFehler.value = e.message || 'Abmeldung fehlgeschlagen.'
+  } finally {
+    abmeldenLaden.value = false
+  }
+}
+
+function formatZeit(datum) {
+  return new Date(datum).toLocaleTimeString('de-DE', {
+    hour: '2-digit',
+    minute: '2-digit'
+  })
 }
 </script>
 
@@ -336,7 +413,8 @@ async function anmelden() {
   margin: 1.2rem 0;
 }
 
-.anmeldung h3 {
+.anmeldung h3,
+.abmeldung h3 {
   font-size: 1rem;
   color: #fff;
   margin-bottom: 1rem;
@@ -405,6 +483,29 @@ async function anmelden() {
   cursor: not-allowed;
 }
 
+.abmelden-btn {
+  width: 100%;
+  background: #444;
+  color: white;
+  border: none;
+  padding: 0.75rem;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  transition: background 0.2s;
+}
+
+.abmelden-btn:hover:not(:disabled) {
+  background: #666;
+}
+
+.abmelden-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .erfolg {
   background: #1e4d2b;
   color: #a8d8a8;
@@ -412,6 +513,7 @@ async function anmelden() {
   padding: 1rem;
   text-align: center;
   font-weight: 600;
+  margin-bottom: 1rem;
 }
 
 .fehler {

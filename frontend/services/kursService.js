@@ -25,10 +25,12 @@ export async function getKursTermineFuerWoche(wochenstart) {
       beschreibung: termin.kurs.beschreibung,
       dauer: termin.kurs.dauer,
       minAlter: termin.kurs.minAlter,
-      geschlecht: termin.kurs.geschlecht,
+      geschlecht: ['m', 'w', 'd'].includes(termin.kurs.geschlecht)
+        ? termin.kurs.geschlecht
+        : null,
       trainer: `Trainer ${termin.trainerID}`,
       teilnehmerAnzahl: termin.teilnehmerAnzahl ?? 0,
-      maxTeilnehmer: termin.maxTeilnehmer,
+      maxTeilnehmer: termin.maxTeilnehmer ?? null,
       istVoll: termin.maxTeilnehmer
         ? (termin.teilnehmerAnzahl ?? 0) >= termin.maxTeilnehmer
         : false
@@ -37,7 +39,7 @@ export async function getKursTermineFuerWoche(wochenstart) {
 }
 
 export async function anmeldenZuKurs(daten) {
-  const buchungResponse = await fetch(`${API_BASE_URL}/Buchungen/buchen`, {
+  const response = await fetch(`${API_BASE_URL}/buchungen`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -51,11 +53,31 @@ export async function anmeldenZuKurs(daten) {
     })
   })
 
-  if (!buchungResponse.ok) {
-    const err = await buchungResponse.json().catch(() => ({}))
-    throw new Error(err.message || 'Buchung fehlgeschlagen.')
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}))
+    throw new Error(err.message || 'Anmeldung fehlgeschlagen.')
   }
 
-  const text = await buchungResponse.text()
+  const text = await response.text()
+  return text ? JSON.parse(text) : { success: true }
+}
+
+export async function abmeldenVonKurs(daten) {
+  const response = await fetch(`${API_BASE_URL}/Buchungen`, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      vorname: daten.vorname,
+      name: daten.name,
+      TerminId: daten.kursTerminId
+    })
+  })
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}))
+    throw new Error(err.message || 'Abmeldung fehlgeschlagen.')
+  }
+
+  const text = await response.text()
   return text ? JSON.parse(text) : { success: true }
 }
