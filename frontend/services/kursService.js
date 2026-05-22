@@ -81,3 +81,31 @@ export async function abmeldenVonKurs(daten) {
   const text = await response.text()
   return text ? JSON.parse(text) : { success: true }
 }
+
+export async function erstelleKursTermin(daten) {
+  const response = await fetch(`${API_BASE_URL}/KursTermine`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      anfang: daten.anfang,
+      kursId: daten.kursId,
+      maxTeilnehmer: daten.maxTeilnehmer
+    })
+  })
+}
+export async function loescheKursTermin(terminId) {
+  const response = await fetch(`${API_BASE_URL}/KursTermine/${terminId}`, {
+    method: 'DELETE'
+  })
+}
+export async function aktualisiereKursTermin(terminId, daten) {
+  const response = await fetch(`${API_BASE_URL}/KursTermine/${terminId}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      anfang: daten.anfang,
+      kursId: daten.kursId,
+      maxTeilnehmer: daten.maxTeilnehmer
+    })
+  })
+}
