@@ -251,4 +251,40 @@ onMounted(ladeTermine)
   text-align: center;
   margin-top: 1rem;
 }
+
+@media (max-width: 1100px) {
+  .kalender-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .kalender-wrapper {
+    padding: 0.75rem;
+  }
+
+  .kalender-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tag-spalte {
+    min-height: auto;
+  }
+
+  .tag-header {
+    padding-bottom: 0.4rem;
+    margin-bottom: 0.4rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .kalender-wrapper {
+    padding: 0.5rem;
+  }
+
+  .tag-spalte {
+    padding: 0.5rem;
+    border-radius: 10px;
+  }
+}
 </style>

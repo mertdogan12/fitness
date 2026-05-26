@@ -72,4 +72,34 @@ function formatDatum(datum) {
   cursor: not-allowed;
   opacity: 0.5;
 }
+
+@media (max-width: 768px) {
+  .wochen-navigator {
+    padding: 0.85rem;
+    gap: 0.75rem;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .wochen-titel {
+    order: -1;
+    text-align: center;
+    font-size: 1rem;
+  }
+
+  .nav-btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .wochen-navigator {
+    padding: 0.75rem;
+  }
+
+  .wochen-titel {
+    font-size: 0.95rem;
+    line-height: 1.3;
+  }
+}
 </style>
