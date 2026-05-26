@@ -19,13 +19,11 @@
         class="tag-spalte"
         :class="{ heute: istHeute(tag.datum) }"
       >
-        <!-- Spalten-Header -->
         <div class="tag-header">
           <span class="tag-name">{{ tag.name }}</span>
           <span class="tag-datum">{{ formatTagDatum(tag.datum) }}</span>
         </div>
 
-        <!-- Kurskarten -->
         <div class="tag-kurse">
           <KursKarte
             v-for="termin in termineProTag(tag.datum)"
@@ -37,15 +35,17 @@
           <p v-if="termineProTag(tag.datum).length === 0" class="keine-kurse">
             Keine Kurse
           </p>
-          <KursModal
-            v-if="ausgewaehlterTermin"
-            :termin="ausgewaehlterTermin"
-            :farbe="kursfarbe(ausgewaehlterTermin.kursId)"
-            @schliessen="modalSchliessen"
-            />
         </div>
       </div>
     </div>
+
+    <!-- Modal außerhalb des v-for -->
+    <KursModal
+      v-if="ausgewaehlterTermin"
+      :termin="ausgewaehlterTermin"
+      :farbe="kursfarbe(ausgewaehlterTermin.kursId)"
+      @schliessen="modalSchliessen"
+    />
   </div>
 </template>
 
@@ -101,7 +101,7 @@ const istMaxWoche = computed(() => wochenOffset.value >= 1)
 
 function wocheWechseln(richtung) {
   const neuerOffset = wochenOffset.value + richtung
-  if (neuerOffset < 0 || neuerOffset > 1) return
+  if (neuerOffset > 1) return  // nur vorwärts begrenzen
   wochenOffset.value = neuerOffset
 }
 
