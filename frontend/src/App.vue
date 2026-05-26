@@ -2,7 +2,7 @@
   <div class="app">
     <header class="app-header">
       <h1>🏋️ Fitti Exempel – Kurskalender</h1>
-      <button class="trainer-btn" @click="$router.push('/trainer/login')">
+      <button class="trainer-btn" @click="$router.push('/trainer/dashboard')">
         🔐 Trainer-Bereich
       </button>
     </header>

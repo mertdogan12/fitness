@@ -111,3 +111,45 @@ export async function aktualisiereKursTermin(terminId, daten) {
     })
   })
 }
+
+// New API helpers matching provided endpoints
+export async function createKurstermin(daten) {
+  const response = await fetch(`${API_BASE_URL}/KurstTermin`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      id: daten.id ?? 0,
+      kursId: daten.kursId,
+      trainerID: daten.trainerID ?? 0,
+      anfang: daten.anfang,
+      maxTeilnehmer: daten.maxTeilnehmer
+    })
+  })
+
+  if (!response.ok) {
+    const errText = await response.text().catch(() => null)
+    throw new Error(errText || 'Fehler beim Erstellen des Kurstermins')
+  }
+
+  const text = await response.text()
+  return text ? JSON.parse(text) : null
+}
+
+export async function deleteKurstermin(id) {
+  const response = await fetch(`${API_BASE_URL}/KursTermin?id=${encodeURIComponent(id)}`, {
+    method: 'DELETE'
+  })
+
+  if (!response.ok) {
+    const errText = await response.text().catch(() => null)
+    throw new Error(errText || 'Fehler beim Löschen des Kurstermins')
+  }
+
+  return true
+}
+
+export async function getKurse() {
+  const response = await fetch(`${API_BASE_URL}/Kurs`)
+  if (!response.ok) throw new Error('Fehler beim Laden der Kurse')
+  return response.json()
+}

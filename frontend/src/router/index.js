@@ -15,7 +15,6 @@ const routes = [
   {
     path: '/trainer/dashboard',
     component: TrainerDashboard,
-    meta: { requiresAuth: true }  // geschützte Route
   }
 ]
 
