@@ -55,7 +55,7 @@ namespace Fitness.Controllers
                 return BadRequest($"Error beim löschen des Kurstermines. {ex.Message}");
             }
 
-            return NotFound(termin);
+            return NoContent();
         }
 
         [HttpGet("{id}")]

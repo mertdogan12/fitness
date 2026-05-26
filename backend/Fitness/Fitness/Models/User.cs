@@ -8,7 +8,6 @@ namespace Fitness.Models
     {
         [Key]
         [Column("ID")]
-        [Required]
         public int Id { get; set; }
 
         [Column("VORNAME")]

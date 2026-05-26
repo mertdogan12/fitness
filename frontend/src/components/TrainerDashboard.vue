@@ -87,7 +87,6 @@ async function createTermin() {
   try {
     if (!kursId.value) throw new Error('Bitte einen Kurs auswählen')
     const payload = {
-      id: 0,
       kursId: Number(kursId.value),
       trainerID: Number(trainerID.value),
       anfang: isoFromLocalDatetime(anfang.value),

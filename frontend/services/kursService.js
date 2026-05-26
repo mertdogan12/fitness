@@ -114,11 +114,10 @@ export async function aktualisiereKursTermin(terminId, daten) {
 
 // New API helpers matching provided endpoints
 export async function createKurstermin(daten) {
-  const response = await fetch(`${API_BASE_URL}/KurstTermin`, {
+  const response = await fetch(`${API_BASE_URL}/KursTermin`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      id: daten.id ?? 0,
       kursId: daten.kursId,
       trainerID: daten.trainerID ?? 0,
       anfang: daten.anfang,

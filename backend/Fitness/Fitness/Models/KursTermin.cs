@@ -8,7 +8,6 @@ namespace Fitness.Models
     {
         [Key]
         [Column("ID")]
-        [Required]
         public int Id { get; set; }
 
         [Column("KURS_ID")]
@@ -25,7 +24,7 @@ namespace Fitness.Models
         [Column("ANFANG", TypeName = "DATE")]
         public DateTime? Anfang { get; set; }
 
-        [Column("MAX_TEILNEHMERZAHL")]
+        [Column("MAX_TEILNEHMER")]
         [Required]
         public int MaxTeilnehmer { get; set; }
     }
