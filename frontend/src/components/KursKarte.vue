@@ -2,7 +2,7 @@
   <div
     class="kurs-karte"
     :class="{ voll: termin.istVoll }"
-    @click="!termin.istVoll && $emit('kursGeklickt', termin)"
+    @click="$emit('kursGeklickt', termin)"
   >
     <div class="kurs-karte-top" :style="{ background: farbe }">
       <span class="kurs-titel">{{ termin.titel }}</span>
@@ -66,14 +66,13 @@ function formatZeit(datum) {
   border: 1px solid rgba(255,255,255,0.06);
 }
 
-.kurs-karte:hover:not(.voll) {
+.kurs-karte.voll:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 
 .kurs-karte.voll {
   opacity: 0.45;
-  cursor: not-allowed;
 }
 
 .kurs-karte-top {
