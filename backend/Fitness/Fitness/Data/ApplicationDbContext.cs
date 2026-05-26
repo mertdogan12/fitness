@@ -9,6 +9,7 @@ namespace Fitness.Data
         public DbSet<Kurs> Kurse { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<NimmtTeil> NimmtTeil { get; set; }
+        public DbSet<Trainer> Trainer { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
