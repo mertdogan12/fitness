@@ -40,6 +40,7 @@ body {
   color: #e0e0e0;
   font-family: 'Segoe UI', sans-serif;
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 .app-header {
@@ -76,5 +77,39 @@ body {
 .trainer-btn:hover {
   background: #e63946;
   color: white;
+}
+
+@media (max-width: 768px) {
+  .app-header {
+    padding: 1rem;
+    gap: 0.75rem;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .app-header h1 {
+    font-size: 1.1rem;
+    text-align: center;
+  }
+
+  .trainer-btn {
+    width: 100%;
+    padding: 0.6rem 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    background-attachment: scroll;
+  }
+
+  .app-header {
+    padding: 0.85rem;
+  }
+
+  .app-header h1 {
+    font-size: 1rem;
+    line-height: 1.3;
+  }
 }
 </style>

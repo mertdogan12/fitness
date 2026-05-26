@@ -210,4 +210,76 @@ onMounted(() => {
 
 input[type="number"], input[type="date"], input[type="datetime-local"] { background: transparent; border: 1px solid rgba(255,255,255,0.06); padding: 0.35rem 0.5rem; border-radius: 6px; color: #e0e0e0 }
 label { color:#ddd; font-size:0.95rem }
+
+@media (max-width: 768px) {
+  .trainer-dashboard {
+    padding: 0.75rem;
+  }
+
+  .page-title {
+    font-size: 1.1rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .card,
+  .card-small {
+    padding: 0.85rem;
+  }
+
+  .form-row,
+  .filter-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.65rem;
+  }
+
+  .form-row label,
+  .filter-row label {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .card-small,
+  .termin-item {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .termin-actions {
+    margin-left: 0;
+  }
+
+  .nav-btn {
+    width: 100%;
+  }
+
+  input[type="number"],
+  input[type="date"],
+  input[type="datetime-local"],
+  select {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .trainer-dashboard {
+    padding: 0.5rem;
+  }
+
+  .card,
+  .card-small {
+    border-radius: 10px;
+  }
+
+  .termin-title {
+    font-size: 0.95rem;
+  }
+
+  .termin-meta {
+    font-size: 0.82rem;
+  }
+}
 </style>

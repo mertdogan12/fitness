@@ -119,4 +119,35 @@ function formatZeit(datum) {
 .text-frei {
   color: #a8d8a8;
 }
+
+@media (max-width: 768px) {
+  .kurs-karte {
+    margin-bottom: 0.75rem;
+  }
+
+  .kurs-karte-top,
+  .kurs-karte-body {
+    padding-left: 0.85rem;
+    padding-right: 0.85rem;
+  }
+
+  .kurs-row {
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .kurs-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .kurs-titel {
+    font-size: 0.95rem;
+  }
+
+  .kurs-uhrzeit {
+    font-size: 0.72rem;
+  }
+}
 </style>
