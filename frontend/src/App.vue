@@ -2,8 +2,11 @@
   <div class="app">
     <header class="app-header">
       <h1>🏋️ Fitti Exempel – Kurskalender</h1>
-      <button class="trainer-btn" @click="$router.push('/trainer/dashboard')">
-        🔐 Trainer-Bereich
+      <button 
+        class="trainer-btn" 
+        @click="route.path === '/trainer/dashboard' ? $router.push('/') : $router.push('/trainer/dashboard')"
+      >
+        {{ route.path === '/trainer/dashboard' ? '← Zurück zum Kalender' : '🔐 Trainer-Bereich' }}
       </button>
     </header>
     <main>
@@ -14,6 +17,9 @@
 
 <script setup>
 import { RouterView } from 'vue-router'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
 </script>
 
 <style>
