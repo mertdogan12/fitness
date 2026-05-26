@@ -14,32 +14,50 @@ export async function getKursTermineFuerWoche(wochenstart) {
   if (!response.ok) throw new Error('Fehler beim Laden der Kurstermine')
 
   const daten = await response.json()
-  return daten.map(termin => {
-    const anfang = new Date(termin.anfang)
-    const ende = new Date(anfang.getTime() + (termin.kurs.dauer || 60) * 60000)
 
-    return {
-      terminId: termin.id,
-      anfang,
-      ende,
-      kursId: termin.kursId,
-      titel: termin.kurs.titel,
-      beschreibung: termin.kurs.beschreibung,
-      dauer: termin.kurs.dauer,
-      minAlter: termin.kurs.minAlter,
-      geschlecht: ['m'].includes(termin.kurs.geschlecht)
-        ? termin.kurs.geschlecht
-        : null,
-      trainer: `Trainer ${termin.trainerID}`,
-      teilnehmerAnzahl: termin.teilnehmerAnzahl ?? 0,
-      maxTeilnehmer: termin.maxTeilnehmer ?? null,
-      istVoll: termin.maxTeilnehmer
-        ? (termin.teilnehmerAnzahl ?? 0) >= termin.maxTeilnehmer
-        : false
+
+// Alle Trainer parallel laden
+const termineArray = await Promise.all(daten.map(async termin => {
+  const anfang = new Date(termin.anfang)
+  const ende = new Date(anfang.getTime() + (termin.kurs.dauer || 60) * 60000)
+
+  // Trainer laden
+  let trainerName = `Trainer ${termin.trainerID}`
+  try {
+    const trainer = await fetch(`${API_BASE_URL}/Trainer/${termin.trainerID}`)
+    if (trainer.ok) {
+      const trainerDaten = await trainer.json()
+      trainerName = `${trainerDaten.vorname} ${trainerDaten.name}`
     }
-  })
-}
+  } catch (e) {
+    console.warn('Trainer konnte nicht geladen werden:', e)
+  }
 
+  return {
+    terminId: termin.id,
+    anfang,
+    ende,
+    kursId: termin.kursId,
+    titel: termin.kurs.titel,
+    beschreibung: termin.kurs.beschreibung,
+    dauer: termin.kurs.dauer,
+    minAlter: termin.kurs.minAlter,
+    geschlecht: ['w'].includes(termin.kurs.geschlecht)
+      ? termin.kurs.geschlecht
+      : null,
+    trainer: trainerName,
+    teilnehmerAnzahl: termin.teilnehmerAnzahl ?? 0,
+    maxTeilnehmer: termin.maxTeilnehmer ?? null,
+    istVoll: termin.maxTeilnehmer
+      ? (termin.teilnehmerAnzahl ?? 0) >= termin.maxTeilnehmer
+      : false
+    }
+  
+
+}))
+
+return termineArray
+}
 export async function anmeldenZuKurs(daten) {
   const response = await fetch(`${API_BASE_URL}/buchungen`, {
     method: 'POST',
@@ -150,5 +168,11 @@ export async function deleteKurstermin(id) {
 export async function getKurse() {
   const response = await fetch(`${API_BASE_URL}/Kurs`)
   if (!response.ok) throw new Error('Fehler beim Laden der Kurse')
+  return response.json()
+}
+
+export async function getTrainer(trainerId) {
+  const response = await fetch(`${API_BASE_URL}/Trainer/${trainerId}`)
+  if (!response.ok) throw new Error('Trainer nicht gefunden')
   return response.json()
 }
