@@ -45,6 +45,7 @@
       :termin="ausgewaehlterTermin"
       :farbe="kursfarbe(ausgewaehlterTermin.kursId)"
       @schliessen="modalSchliessen"
+      @aktualisieren="ladeTermine"
     />
   </div>
 </template>

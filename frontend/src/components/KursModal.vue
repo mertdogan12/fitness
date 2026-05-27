@@ -189,7 +189,7 @@ const props = defineProps({
   }
 })
 
-defineEmits(['schliessen'])
+const emit =defineEmits(['schliessen', 'aktualisieren'])
 
 // ── Anmeldung ──────────────────────────────────────
 const formular = reactive({
@@ -260,6 +260,7 @@ async function anmelden() {
       kursTerminId: props.termin.terminId
     })
     anmeldungErfolgreich.value = true
+    emit('aktualisieren')
   } catch (e) {
     fehler.value = e.message || 'Ein Fehler ist aufgetreten.'
   } finally {
@@ -310,6 +311,7 @@ async function abmelden() {
       kursTerminId: props.termin.terminId
     })
     abmeldungErfolgreich.value = true
+    emit('aktualisieren')
   } catch (e) {
     abmeldeFehler.value = e.message || 'Abmeldung fehlgeschlagen.'
   } finally {
