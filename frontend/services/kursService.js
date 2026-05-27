@@ -3,61 +3,51 @@ const API_BASE_URL = import.meta.env.VITE_API_URL
 export async function getKursTermineFuerWoche(wochenstart) {
   const von = wochenstart.toLocaleDateString('en-CA')
 
-  const wochenende = new Date(wochenstart)
-  wochenende.setDate(wochenende.getDate() + 7)
-  const bis = wochenende.toISOString().split('T')[0]
-
-  console.log('von:', von, 'bis:', bis)
-
   const response = await fetch(`${API_BASE_URL}/KursTermin?von=${von}`)
 
   if (!response.ok) throw new Error('Fehler beim Laden der Kurstermine')
 
   const daten = await response.json()
 
+  const termineArray = await Promise.all(daten.map(async termin => {
+    const anfang = new Date(termin.anfang)
+    const ende = new Date(anfang.getTime() + (termin.kurs.dauer || 60) * 60000)
 
-// Alle Trainer parallel laden
-const termineArray = await Promise.all(daten.map(async termin => {
-  const anfang = new Date(termin.anfang)
-  const ende = new Date(anfang.getTime() + (termin.kurs.dauer || 60) * 60000)
-
-  // Trainer laden
-  let trainerName = `Trainer ${termin.trainerID}`
-  try {
-    const trainer = await fetch(`${API_BASE_URL}/Trainer/${termin.trainerID}`)
-    if (trainer.ok) {
-      const trainerDaten = await trainer.json()
-      trainerName = `${trainerDaten.vorname} ${trainerDaten.name}`
+    let trainerName = `Trainer ${termin.trainerID}`
+    try {
+      const trainerResponse = await fetch(`${API_BASE_URL}/Trainer/${termin.trainerID}`)
+      if (trainerResponse.ok) {
+        const trainerDaten = await trainerResponse.json()
+        trainerName = `${trainerDaten.vorname} ${trainerDaten.name}`
+      }
+    } catch (e) {
+      console.warn('Trainer konnte nicht geladen werden:', e)
     }
-  } catch (e) {
-    console.warn('Trainer konnte nicht geladen werden:', e)
-  }
 
-  return {
-    terminId: termin.id,
-    anfang,
-    ende,
-    kursId: termin.kursId,
-    titel: termin.kurs.titel,
-    beschreibung: termin.kurs.beschreibung,
-    dauer: termin.kurs.dauer,
-    minAlter: termin.kurs.minAlter,
-    geschlecht: ['w'].includes(termin.kurs.geschlecht)
-      ? termin.kurs.geschlecht
-      : null,
-    trainer: trainerName,
-    teilnehmerAnzahl: termin.teilnehmerAnzahl ?? 0,
-    maxTeilnehmer: termin.maxTeilnehmer ?? null,
-    istVoll: termin.maxTeilnehmer
-      ? (termin.teilnehmerAnzahl ?? 0) >= termin.maxTeilnehmer
-      : false
+    return {
+      terminId: termin.id,
+      anfang,
+      ende,
+      kursId: termin.kursId,
+      titel: termin.kurs.titel,
+      beschreibung: termin.kurs.beschreibung,
+      dauer: termin.kurs.dauer,
+      minAlter: termin.kurs.minAlter,
+      geschlecht: ['w'].includes(termin.kurs.geschlecht)
+        ? termin.kurs.geschlecht
+        : null,
+      trainer: trainerName,
+      teilnehmerAnzahl: termin.teilnehmerAnzahl ?? 0,
+      maxTeilnehmer: termin.maxTeilnehmer ?? null,
+      istVoll: termin.maxTeilnehmer
+        ? (termin.teilnehmerAnzahl ?? 0) >= termin.maxTeilnehmer
+        : false
     }
-  
+  }))
 
-}))
-
-return termineArray
+  return termineArray
 }
+
 export async function anmeldenZuKurs(daten) {
   const response = await fetch(`${API_BASE_URL}/buchungen`, {
     method: 'POST',
@@ -102,43 +92,20 @@ export async function abmeldenVonKurs(daten) {
   return text ? JSON.parse(text) : { success: true }
 }
 
-export async function erstelleKursTermin(daten) {
-  const response = await fetch(`${API_BASE_URL}/KursTermine`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      anfang: daten.anfang,
-      kursId: daten.kursId,
-      maxTeilnehmer: daten.maxTeilnehmer
-    })
-  })
-}
-export async function loescheKursTermin(terminId) {
-  const response = await fetch(`${API_BASE_URL}/KursTermine/${terminId}`, {
-    method: 'DELETE'
-  })
-}
-export async function aktualisiereKursTermin(terminId, daten) {
-  const response = await fetch(`${API_BASE_URL}/KursTermine/${terminId}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      anfang: daten.anfang,
-      kursId: daten.kursId,
-      maxTeilnehmer: daten.maxTeilnehmer
-    })
-  })
-}
-
-// New API helpers matching provided endpoints
 export async function createKurstermin(daten) {
+  const datum = new Date(daten.anfang)
+  const offset = datum.getTimezoneOffset() * 60000
+  const lokalerString = new Date(datum - offset).toISOString().slice(0, 19)
+
   const response = await fetch(`${API_BASE_URL}/KursTermin`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
+      id: 0,
       kursId: daten.kursId,
+      kurs: null,
       trainerID: daten.trainerID ?? 0,
-      anfang: daten.anfang,
+      anfang: lokalerString,
       maxTeilnehmer: daten.maxTeilnehmer
     })
   })
@@ -171,8 +138,8 @@ export async function getKurse() {
   return response.json()
 }
 
-export async function getTrainer(trainerId) {
-  const response = await fetch(`${API_BASE_URL}/Trainer/${trainerId}`)
-  if (!response.ok) throw new Error('Trainer nicht gefunden')
+export async function getTrainer() {
+  const response = await fetch(`${API_BASE_URL}/Trainer`)
+  if (!response.ok) throw new Error('Fehler beim Laden der Trainer')
   return response.json()
 }
