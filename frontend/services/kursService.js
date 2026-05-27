@@ -152,3 +152,9 @@ export async function getKurse() {
   if (!response.ok) throw new Error('Fehler beim Laden der Kurse')
   return response.json()
 }
+
+export async function getTrainerList() {
+  const response = await fetch(`${API_BASE_URL}/Trainer`)
+  if (!response.ok) throw new Error('Fehler beim Laden der Trainer')
+  return response.json()
+}

@@ -7,11 +7,16 @@
       <div class="form-row">
         <label>Kurs: 
           <select v-model.number="kursId" :disabled="loadingKurse">
-            <option disabled value="">-- Kurs wählen --</option>
+            <option disabled :value="null">-- Kurs wählen --</option>
             <option v-for="k in kurse" :key="k.id" :value="k.id">{{ k.titel }}</option>
           </select>
         </label>
-        <label>Trainer ID: <input v-model.number="trainerID" type="number" /></label>
+        <label>Trainer:
+          <select v-model.number="trainerId" :disabled="loadingTrainers">
+            <option disabled :value="null">-- Trainer wählen --</option>
+            <option v-for="tr in trainerList" :key="tr.id" :value="tr.id">{{ tr.vorname }} {{ tr.name }}</option>
+          </select>
+        </label>
       </div>
       <div class="form-row">
         <label>Anfang: <input v-model="anfang" type="datetime-local" /></label>
@@ -51,16 +56,21 @@
       </ul>
     </section>
 
-    <div v-if="message" :class="{success: success, error: !success}" class="message">{{ message }}</div>
+    <div v-if="message" class="message-box" :class="success ? 'success' : 'error'">
+      <span class="message-icon" v-if="success" aria-hidden="true">✓</span>
+      <span class="message-icon" v-else aria-hidden="true">!</span>
+      <div class="message-text">{{ message }}</div>
+      <button class="message-close" @click="clearMessage" aria-label="Schließen">×</button>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { createKurstermin, deleteKurstermin, getKursTermineFuerWoche, getKurse } from '../../services/kursService.js'
+import { createKurstermin, deleteKurstermin, getKursTermineFuerWoche, getKurse, getTrainerList } from '../../services/kursService.js'
 
 const kursId = ref(null)
-const trainerID = ref(0)
+const trainerId = ref(null)
 const anfang = ref('')
 const maxTeilnehmer = ref(0)
 const deleteId = ref(null)
@@ -74,6 +84,8 @@ const loading = ref(false)
 const deletingIds = ref(new Set())
 const kurse = ref([])
 const loadingKurse = ref(false)
+const trainerList = ref([])
+const loadingTrainers = ref(false)
 
 function isoFromLocalDatetime(local) {
   if (!local) return null
@@ -86,9 +98,10 @@ async function createTermin() {
   creating.value = true
   try {
     if (!kursId.value) throw new Error('Bitte einen Kurs auswählen')
+    if (!trainerId.value) throw new Error('Bitte einen Trainer auswählen')
     const payload = {
       kursId: Number(kursId.value),
-      trainerID: Number(trainerID.value),
+      trainerID: Number(trainerId.value),
       anfang: isoFromLocalDatetime(anfang.value),
       maxTeilnehmer: Number(maxTeilnehmer.value)
     }
@@ -177,10 +190,28 @@ async function loadKurse() {
   }
 }
 
+async function loadTrainers() {
+  loadingTrainers.value = true
+  try {
+    trainerList.value = await getTrainerList()
+    if (!trainerId.value && trainerList.value.length) trainerId.value = trainerList.value[0].id
+  } catch (err) {
+    message.value = err?.message || 'Fehler beim Laden der Trainer.'
+    success.value = false
+  } finally {
+    loadingTrainers.value = false
+  }
+}
+
 onMounted(() => {
   loadKurse()
   loadTermine()
+  loadTrainers()
 })
+
+function clearMessage() {
+  message.value = ''
+}
 </script>
 
 <style scoped>
@@ -198,6 +229,16 @@ onMounted(() => {
 .termin-actions { margin-left:1rem }
 .loading { color:#bbb }
 .message { margin-top:1rem }
+
+/* improved message box */
+.message-box { margin-top:1rem; display:flex; align-items:center; gap:0.75rem; padding:0.6rem 0.75rem; border-radius:8px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.03) }
+.message-box.success { border-left: 4px solid #8fd19a; color: #dff7e6 }
+.message-box.error { border-left: 4px solid #e63946; color: #ffdede }
+.message-icon { font-weight:700; font-size:1.05rem; width:1.2rem; display:inline-flex; align-items:center; justify-content:center }
+.message-text { flex:1 }
+.message-close { background:transparent; border:none; color:inherit; font-size:1.05rem; cursor:pointer; padding:0.15rem 0.4rem; border-radius:6px }
+.message-close:hover { background: rgba(255,255,255,0.02) }
+
 .success { color: #a8d8a8 }
 .error { color: #e63946 }
 
