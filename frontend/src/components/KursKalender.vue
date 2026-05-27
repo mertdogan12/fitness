@@ -164,6 +164,12 @@ async function ladeTermine() {
   apiFehler.value = ''
   try {
     termine.value = await getKursTermineFuerWoche(wochenstart.value)
+
+    if (ausgewaehlterTermin.value) {
+      ausgewaehlterTermin.value = termine.value.find(
+        t => t.terminId === ausgewaehlterTermin.value.terminId
+      ) ?? null
+    }
   } catch (e) {
     console.error('Fehler beim Laden:', e)
     apiFehler.value = 'Kurse konnten nicht geladen werden. Bitte später erneut versuchen.'
