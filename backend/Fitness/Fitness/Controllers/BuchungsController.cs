@@ -35,6 +35,9 @@ namespace Fitness.Controllers
             if (termin.Kurs.Geschlecht != user.Geschlecht && termin.Kurs.Geschlecht != "alle")
                 return BadRequest($"User muss das Geschlecht {termin.Kurs.Geschlecht} haben");
 
+            if (user.Alter < termin.Kurs.MinAlter)
+                return BadRequest($"User muss älter als {termin.Kurs.MinAlter} sein");
+
             _context.NimmtTeil.Add(buchung);
 
             try
