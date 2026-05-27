@@ -22,7 +22,7 @@
         <label>Anfang: <input v-model="anfang" type="datetime-local" /></label>
         <label>Max. Teiln.: <input v-model.number="maxTeilnehmer" type="number" /></label>
       </div>
-      <button class="nav-btn" @click="createTermin" :disabled="creating">Termin erstellen</button>
+      <button class="nav-btn" @click="createTermin" :disabled="creating || !formValid">Termin erstellen</button>
     </section>
 
     <section class="card" style="margin-top:1em;">
@@ -66,7 +66,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { createKurstermin, deleteKurstermin, getKursTermineFuerWoche, getKurse, getTrainerList } from '../../services/kursService.js'
 
 const kursId = ref(null)
@@ -86,6 +86,10 @@ const kurse = ref([])
 const loadingKurse = ref(false)
 const trainerList = ref([])
 const loadingTrainers = ref(false)
+
+const formValid = computed(() => {
+  return Boolean(kursId.value) && Boolean(trainerId.value) && Boolean(anfang.value) && Number(maxTeilnehmer.value) > 0
+})
 
 function isoFromLocalDatetime(local) {
   if (!local) return null
